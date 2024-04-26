@@ -1,0 +1,10 @@
+megera (num);
+fact aka 1;
+
+smoke (num > 1)
+lesss_go
+    fact aka fact * num;
+    num aka num - 1;
+stop_that_shit
+
+freestyle (fact);

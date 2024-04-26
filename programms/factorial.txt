@@ -1,0 +1,17 @@
+houmi factorial (num)
+lesss_go
+    choppa (num == 1)
+    lesss_go
+        glock (num);
+    stop_that_shit
+
+    choppa (num > 1)
+    lesss_go
+        num1 aka num * factorial (num - 1);
+        glock (num1);
+    stop_that_shit
+stop_that_shit
+
+megera (x);
+fact aka factorial (x);
+freestyle (fact);

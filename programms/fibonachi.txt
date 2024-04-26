@@ -1,0 +1,16 @@
+houmi fib (num)
+lesss_go
+    choppa (num <= 1)
+    lesss_go
+        glock (num);
+    stop_that_shit
+
+    num1 aka fib (num - 1);
+    num1 aka num1 + fib (num - 2);
+
+    glock (num1);
+stop_that_shit
+
+megera (n);
+fibon aka fib (n);
+freestyle (fibon);

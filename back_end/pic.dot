@@ -1,0 +1,40 @@
+digraph DotGraph
+{
+    Node1 [shape="box", color="black", fontcolor="black", fillcolor="#F9FF15", style="rounded, filled", weight="1", label="main"];
+    Node4 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node9 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="megera"];
+    Node20 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node9 -> Node20 [color="#4682B4", style="bold", weight="1", label=""];
+    Node4 -> Node9 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node21 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="aka"];
+    Node43 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="*"];
+    Node87 [shape="box", color="black", fontcolor="black", fillcolor="#F9FF15", style="rounded, filled", weight="1", label="func0"];
+    Node175 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=","];
+    Node351 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="+"];
+    Node703 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node351 -> Node703 [color="#4682B4", style="bold", weight="1", label=""];
+    Node704 [shape="box", color="black", fontcolor="black", fillcolor="#F77152", style="rounded, filled", weight="1", label="2.000"];
+    Node351 -> Node704 [color="#4682B4", style="bold", weight="1", label=""];
+    Node175 -> Node351 [color="#4682B4", style="bold", weight="1", label=""];
+    Node352 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=","];
+    Node705 [shape="box", color="black", fontcolor="black", fillcolor="#F77152", style="rounded, filled", weight="1", label="90.000"];
+    Node352 -> Node705 [color="#4682B4", style="bold", weight="1", label=""];
+    Node175 -> Node352 [color="#4682B4", style="bold", weight="1", label=""];
+    Node87 -> Node175 [color="#4682B4", style="bold", weight="1", label=""];
+    Node43 -> Node87 [color="#4682B4", style="bold", weight="1", label=""];
+    Node88 [shape="box", color="black", fontcolor="black", fillcolor="#F77152", style="rounded, filled", weight="1", label="2.000"];
+    Node43 -> Node88 [color="#4682B4", style="bold", weight="1", label=""];
+    Node21 -> Node43 [color="#4682B4", style="bold", weight="1", label=""];
+    Node44 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var1"];
+    Node21 -> Node44 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 -> Node21 [color="#4682B4", style="bold", weight="1", label=""];
+    Node22 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node45 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="freestyle"];
+    Node92 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var1"];
+    Node45 -> Node92 [color="#4682B4", style="bold", weight="1", label=""];
+    Node22 -> Node45 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 -> Node22 [color="#4682B4", style="bold", weight="1", label=""];
+    Node4 -> Node10 [color="#4682B4", style="bold", weight="1", label=""];
+    Node1 -> Node4 [color="#4682B4", style="bold", weight="1", label=""];
+}

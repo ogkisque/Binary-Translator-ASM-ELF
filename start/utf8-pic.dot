@@ -1,0 +1,46 @@
+digraph DotGraph
+{
+    Node1 [shape="box", color="black", fontcolor="black", fillcolor="#F9FF15", style="rounded, filled", weight="1", label="func0"];
+    Node3 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=","];
+    Node7 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node3 -> Node7 [color="#4682B4", style="bold", weight="1", label=""];
+    Node1 -> Node3 [color="#4682B4", style="bold", weight="1", label=""];
+    Node4 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node9 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="aka"];
+    Node19 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="*"];
+    Node39 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node19 -> Node39 [color="#4682B4", style="bold", weight="1", label=""];
+    Node40 [shape="box", color="black", fontcolor="black", fillcolor="#F77152", style="rounded, filled", weight="1", label="2.000"];
+    Node19 -> Node40 [color="#4682B4", style="bold", weight="1", label=""];
+    Node9 -> Node19 [color="#4682B4", style="bold", weight="1", label=""];
+    Node20 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var1"];
+    Node9 -> Node20 [color="#4682B4", style="bold", weight="1", label=""];
+    Node4 -> Node9 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node21 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="aka"];
+    Node43 [shape="box", color="black", fontcolor="black", fillcolor="#F77152", style="rounded, filled", weight="1", label="1.500"];
+    Node21 -> Node43 [color="#4682B4", style="bold", weight="1", label=""];
+    Node44 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var2"];
+    Node21 -> Node44 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 -> Node21 [color="#4682B4", style="bold", weight="1", label=""];
+    Node22 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node45 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="aka"];
+    Node91 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="+"];
+    Node183 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var1"];
+    Node91 -> Node183 [color="#4682B4", style="bold", weight="1", label=""];
+    Node184 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var2"];
+    Node91 -> Node184 [color="#4682B4", style="bold", weight="1", label=""];
+    Node45 -> Node91 [color="#4682B4", style="bold", weight="1", label=""];
+    Node92 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node45 -> Node92 [color="#4682B4", style="bold", weight="1", label=""];
+    Node22 -> Node45 [color="#4682B4", style="bold", weight="1", label=""];
+    Node46 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label=";"];
+    Node93 [shape="box", color="black", fontcolor="black", fillcolor="#70FC48", style="rounded, filled", weight="1", label="glock"];
+    Node188 [shape="box", color="black", fontcolor="black", fillcolor="#4871FC", style="rounded, filled", weight="1", label="var0"];
+    Node93 -> Node188 [color="#4682B4", style="bold", weight="1", label=""];
+    Node46 -> Node93 [color="#4682B4", style="bold", weight="1", label=""];
+    Node22 -> Node46 [color="#4682B4", style="bold", weight="1", label=""];
+    Node10 -> Node22 [color="#4682B4", style="bold", weight="1", label=""];
+    Node4 -> Node10 [color="#4682B4", style="bold", weight="1", label=""];
+    Node1 -> Node4 [color="#4682B4", style="bold", weight="1", label=""];
+}

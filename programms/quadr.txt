@@ -1,0 +1,85 @@
+houmi a_zero (b, c)
+lesss_go
+    ans aka -c / b + 0;
+    glock (ans);
+stop_that_shit
+
+houmi ab_zero (c)
+lesss_go
+    ans aka 0;
+    choppa (c == 0)
+    lesss_go
+        ans aka 444 + 111;
+    stop_that_shit
+
+    choppa (c != 0)
+    lesss_go
+        ans aka 666;
+    stop_that_shit
+
+    glock (ans);
+stop_that_shit
+
+houmi discr (a, b, c)
+lesss_go
+    discr aka (b * b - 4 * a * c) * 1;
+    glock (discr);
+stop_that_shit
+
+houmi get_ans1 (a, b, d)
+lesss_go
+    ans aka (-b + sqrt (d)) / (2 * a);
+    glock (ans);
+stop_that_shit
+
+houmi get_ans2 (a, b, d)
+lesss_go
+    ans aka (-b - sqrt (d)) / (2 * a);
+    glock (ans);
+stop_that_shit
+
+megera (a);
+megera (b);
+megera (c);
+ans1 aka 0;
+ans2 aka 0;
+
+choppa (a == 0)
+lesss_go
+    ans2 aka 666;
+    choppa (b == 0)
+    lesss_go
+        ans1 aka ab_zero (c);
+    stop_that_shit
+
+    choppa (b != 0)
+    lesss_go
+        ans1 aka a_zero (b, c);
+    stop_that_shit
+stop_that_shit
+
+choppa (a != 0)
+lesss_go
+    d aka discr (a, b, c);
+
+    choppa (d >= 0)
+    lesss_go
+        ans1 aka get_ans1 (a, b, d);
+        ans2 aka get_ans2 (a, b, d);
+    stop_that_shit
+
+    choppa (d < 0)
+    lesss_go
+        ans1 aka 666;
+        ans2 aka 666;
+    stop_that_shit
+stop_that_shit
+
+freestyle (ans1);
+choppa (ans1 != ans2)
+lesss_go
+    choppa (ans2 != 666)
+    lesss_go
+        freestyle (ans2);
+    stop_that_shit
+stop_that_shit
