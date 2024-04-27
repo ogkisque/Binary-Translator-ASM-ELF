@@ -42,25 +42,25 @@ const char* IR_DUMP_DATA_TYPE_TABLE[] = {
         "label_while_start",    "label_while_stop",     "stack"
 };
 
-#define IR_CMD_NUM(func, num)                                                   \
-        ir_add_cmd (func, IR_PUSH, IR_NUM, "", (int) num, IR_NONE, "", 0);                                                 
+#define IR_CMD_NUM(func, num)                                                           \
+        ir_add_cmd (func, IR_PUSH, IR_NUM, "", (int) num, IR_NONE, "", 0);                                          
 
-#define IR_CMD_VAR(func, num_var)                                               \
-        ir_add_cmd (func, IR_PUSH, IR_VAR, "", (int) num_var, IR_NONE, "", 0);                                                                                                  
+#define IR_CMD_VAR(func, num_var)                                                       \
+        ir_add_cmd (func, IR_PUSH, IR_MEM, "", (int) num_var * 8, IR_NONE, "", 0);                                                                                                     
                                    
-#define IR_CMD_FUNC(func, name_func)                                            \
+#define IR_CMD_FUNC(func, name_func)                                                    \
         ir_add_cmd (func, IR_FUNC, IR_NONE, name_func, 0, IR_NONE, "", 0);  
 
-#define IR_CMD_PUSH_REG(func, name_reg)                                         \
-        ir_add_cmd (func, IR_PUSH, IR_REG, name_reg, 0, IR_NONE, "", 0); 
+#define IR_CMD_PUSH_REG(func, name_reg)                                                 \
+        ir_add_cmd (func, IR_PUSH, IR_REG, name_reg, 0, IR_NONE, "", 0);                
 
-#define IR_CMD_POP_REG(func, name_reg)                                         \
-        ir_add_cmd (func, IR_POP, IR_REG, name_reg, 0, IR_NONE, "", 0); 
+#define IR_CMD_POP_REG(func, name_reg)                                                  \
+        ir_add_cmd (func, IR_POP, IR_REG, name_reg, 0, IR_NONE, "", 0);                 
 
-#define IR_CMD_CQO(func)                                         \
+#define IR_CMD_CQO(func)                                                                \
         ir_add_cmd (func, IR_CQO, IR_NONE, "", 0, IR_NONE, "", 0); 
 
-#define IR_CMD_CMP(func)                                         \
+#define IR_CMD_CMP(func)                                                                \
         ir_add_cmd (func, IR_CMP, IR_REG, IR_TMP_REG1, 0, IR_REG, IR_TMP_REG2, 0); 
 
 #endif //IR_CODEGEN_HEADER

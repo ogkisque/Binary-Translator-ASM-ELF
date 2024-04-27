@@ -3,6 +3,7 @@
 #include "read.h"
 #include "print.h"
 #include "read_ir.h"
+#include "print_asm.h"
 
 #define VERIFY(tree)                            \
         error = tree_verify (&tree);            \
@@ -14,7 +15,7 @@
         }
 
 const char*     INPUT_NAME              = "../middle.txt";
-const char*     OUTPUT_NAME             = "../llvm.ll";
+const char*     OUTPUT_NAME             = "../asm.asm";
 
 int main ()
 {
@@ -32,6 +33,10 @@ int main ()
 
     error = ir_fill (&ir, &funcs);
     error = ir_dump (&ir);
+
+    FILE* file_print_asm = fopen (OUTPUT_NAME, "w");
+    error = print_asm (&ir, file_print_asm);
+    fclose (file_print_asm);
 
     funcs_dtor (&funcs);
     error = ir_dtor (&ir);

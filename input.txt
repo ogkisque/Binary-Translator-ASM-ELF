@@ -1,28 +1,10 @@
-houmi func0 (var1, var2)
+num aka 5;
+fact aka 1;
+
+smoke (num > 1)
 lesss_go
-    x aka var1;
-    y aka var2;
-    
-    smoke (x > 0)
-    lesss_go
-        x aka x - 1;
-        y aka y * x;
-    stop_that_shit
-
-    z aka x;
-    choppa (y - 3 == x)
-    lesss_go
-        z aka z + x + y;
-    stop_that_shit
-
-    smoke (z <= y + 2)
-    lesss_go
-        z aka 2 / y;
-    stop_that_shit
-    
-    glock (z);    
+    fact aka fact * num;
+    num aka num - 1;
 stop_that_shit
 
-megera (x);
-y aka func0 (x + 2, 90) * 2;
-freestyle (y);
+freestyle (fact);

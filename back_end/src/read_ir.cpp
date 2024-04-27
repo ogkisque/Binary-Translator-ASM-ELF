@@ -122,9 +122,12 @@ Error ir_fill_func_cmds (IR_Function* ir_func, const Node* node)
     }
     else if (node->type == FUNC)
     {
-        error = ir_fill_func_call_args (ir_func, node->left);
+        error = ir_push_func_call_args (ir_func, node->left, 0);
         PARSE_ERROR_WITHOUT_TREE(error);
+
+        ir_add_cmd (ir_func, IR_ADD, IR_REG, IR_STACK_REG, 0, IR_NUM, "", 8 * ir_func->num_vars);
         IR_CMD_FUNC(ir_func, node->name)
+        ir_add_cmd (ir_func, IR_SUB, IR_REG, IR_STACK_REG, 0, IR_NUM, "", 8 * ir_func->num_vars);
     }
     else //OPER
     {
@@ -147,8 +150,7 @@ Error ir_fill_func_cmds (IR_Function* ir_func, const Node* node)
             error = ir_fill_func_cmds (ir_func, node->left);
             PARSE_ERROR_WITHOUT_TREE(error);
 
-            IR_CMD_POP_REG(ir_func, IR_TMP_REG1)
-            ir_add_cmd (ir_func, IR_MOV, IR_VAR, "", ir_get_num_var(node->right->name), IR_REG, IR_TMP_REG1, 0);
+            ir_add_cmd (ir_func, IR_POP, IR_MEM, "", ir_get_num_var(node->right->name) * 8, IR_NONE, "", 0);
             RETURN_ERROR(CORRECT, "");
         }
 
@@ -157,14 +159,17 @@ Error ir_fill_func_cmds (IR_Function* ir_func, const Node* node)
             error = ir_fill_func_cmds (ir_func, node->right);
             PARSE_ERROR_WITHOUT_TREE(error);
 
+            ir_add_cmd (ir_func, IR_POP, IR_MEM, "", 8 * ir_func->num_vars, IR_NONE, "", 0);
+
+            ir_add_cmd (ir_func, IR_ADD, IR_REG, IR_STACK_REG, 0, IR_NUM, "", 8 * ir_func->num_vars);
             ir_add_cmd (ir_func, IR_FUNC, IR_NONE, IR_FUNC_PRINT_NAME, 0, IR_NONE, "", 0);
+            ir_add_cmd (ir_func, IR_SUB, IR_REG, IR_STACK_REG, 0, IR_NUM, "", 8 * ir_func->num_vars);
         }
 
         if ((int) node->value == INPUT_VAR)
         {
             ir_add_cmd (ir_func, IR_FUNC, IR_NONE, IR_FUNC_INPUT_NAME, 0, IR_NONE, "", 0);
-            IR_CMD_POP_REG(ir_func, IR_TMP_REG1)
-            ir_add_cmd (ir_func, IR_MOV, IR_VAR, "", ir_get_num_var (node->right->name), IR_REG, IR_TMP_REG1, 0);
+            ir_add_cmd (ir_func, IR_POP, IR_MEM, "", 8 * ir_get_num_var (node->right->name), IR_NONE, "", 0);
         }
 
         for (int i = 0; i < IR_TABLE_SIZE; i++)
@@ -185,17 +190,19 @@ Error ir_fill_func_cmds (IR_Function* ir_func, const Node* node)
     RETURN_ERROR(CORRECT, "");
 }
 
-Error ir_fill_func_call_args (IR_Function* ir_func, const Node* node)
+Error ir_push_func_call_args (IR_Function* ir_func, const Node* node, int num_var)
 {
     if (!node)
         RETURN_ERROR(CORRECT, "");
 
     Error error = {};
 
-    error = ir_fill_func_call_args (ir_func, node->right);
+    error = ir_fill_func_cmds (ir_func, node->left);
     PARSE_ERROR_WITHOUT_TREE(error);
 
-    error = ir_fill_func_cmds (ir_func, node->left);
+    ir_add_cmd (ir_func, IR_POP, IR_MEM, "", 8 * ir_func->num_vars + 8 * num_var, IR_NONE,  "", 0);
+
+    error = ir_push_func_call_args (ir_func, node->right, num_var + 1);
     PARSE_ERROR_WITHOUT_TREE(error);
 
     RETURN_ERROR(CORRECT, "");
@@ -220,6 +227,13 @@ Error ir_add_cmd_oper (IR_Function* func, IR_CommandType cmd_type)
     }
     else if (cmd_type == IR_RET)
     {
+        IR_CMD_POP_REG(func, IR_TMP_REG1)
+
+        IR_CMD_POP_REG(func, IR_TMP_REG2)
+        IR_CMD_PUSH_REG(func, IR_TMP_REG1)
+        IR_CMD_PUSH_REG(func, IR_TMP_REG2)
+
+        ir_add_cmd (func, IR_RET, IR_NONE, "", 0, IR_NONE, "", 0);
         RETURN_ERROR(CORRECT, "");
     }
     else

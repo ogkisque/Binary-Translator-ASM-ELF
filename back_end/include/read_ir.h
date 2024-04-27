@@ -92,7 +92,7 @@ Error   ir_fill                 (IR_Struct* ir, Functions* funcs);
 Error   ir_fill_func            (IR_Function* ir_func, const Node* node);
 Error   ir_fill_func_args       (IR_Function* ir_func, const Node* node);
 Error   ir_fill_func_cmds       (IR_Function* ir_func, const Node* node);
-Error   ir_fill_func_call_args  (IR_Function* ir_func, const Node* node);
+Error   ir_push_func_call_args  (IR_Function* ir_func, const Node* node, int num_var);
 Error   ir_add_cmd_oper         (IR_Function* func, IR_CommandType cmd_type);
 Error   ir_add_cmd_if           (IR_Function* func, const Node* node);
 Error   ir_add_cmd_while        (IR_Function* func, const Node* node);

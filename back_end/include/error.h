@@ -26,7 +26,8 @@ enum Error_codes
     POS_MORE_SIZE =     14,
     VARS_OVERFLOW =     15,
     SYNTAX_ERR =        16,
-    UNKNOWN_OPER =      17
+    UNKNOWN_OPER =      17,
+    UNKNOWN_DATA =      18
 };
 
 struct Error
