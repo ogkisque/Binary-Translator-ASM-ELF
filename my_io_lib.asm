@@ -12,6 +12,8 @@ my_input:
     syscall
 
     mov rcx, rax
+    dec rcx
+    xor rax, rax
     mov rsi, BUFF
     xor rbx, rbx
     mov r15, 10
@@ -22,14 +24,18 @@ my_input:
     jne .loop
     mov r11, 1
     inc rsi
+    dec rcx
 
     .loop:
-        xor rax, rax
-        mov al, byte [rsi]
-        sub al, '0'
-        imul rax, r15
-        add rbx, rax
+        xor r13, r13
+        mov r13b, byte [rsi]
+        sub r13b, '0'
+        mov rax, rbx
+        mul r15
+        add rax, r13
+        mov rbx, rax
 
+        inc rsi
         dec rcx
         cmp rcx, 0
         jne .loop
@@ -57,8 +63,9 @@ my_print:
 
     mov rax, [r15]
     mov rsi, BUFF
-    mov rcx, 100
+    mov rcx, 99
     mov r15, 10
+    mov [BUFF + 100], r15b
 
     mov r12b, '0'
     cmp rax, 0
@@ -69,17 +76,18 @@ my_print:
     .loop:
         xor rdx, rdx    ; rdx = 0
         cqo
-        idiv r15        ; rax /= 10, rdx = rax % 10
+        div r15         ; rax /= 10, rdx = rax % 10
 
         add rdx, '0'
         mov byte [BUFF + rcx], dl
         dec rcx
 
         cmp rax, 0
-        je .loop
+        jne .loop
 
     mov [BUFF + rcx], r12b
     add rsi, rcx
+    add rsi, 1
     mov rax, 0x01
     mov rdi, 1
     mov rdx, 100

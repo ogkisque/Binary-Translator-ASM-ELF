@@ -1,5 +1,6 @@
-num aka 5;
+megera (num);
 fact aka 1;
+num aka -num;
 
 smoke (num > 1)
 lesss_go
@@ -7,4 +8,5 @@ lesss_go
     num aka num - 1;
 stop_that_shit
 
+fact aka -fact;
 freestyle (fact);

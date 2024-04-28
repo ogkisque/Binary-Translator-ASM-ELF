@@ -133,7 +133,7 @@ Error print_asm_header (FILE* file)
     fprintf (file, "RAM resw %d\n", RAM_SIZE);
     fprintf (file, "BUFF resb 100\n\n");
     fprintf (file, "section .text\n\n");
-    //fprintf (file, "%%INCLUDE \"%s\"\n\n", IO_LIB_NAME);
+    fprintf (file, "%%INCLUDE \"%s\"\n\n", IO_LIB_NAME);
 
     RETURN_ERROR(CORRECT, "");
 }
