@@ -18,6 +18,9 @@ Error print_asm (IR_Struct* ir, FILE* file)
         PARSE_ERROR_WITHOUT_TREE(error);
     }
 
+    error = print_asm_section_data (file);
+    PARSE_ERROR_WITHOUT_TREE(error);
+
     RETURN_ERROR(CORRECT, "");
 }
 
@@ -27,18 +30,22 @@ Error print_asm_func (IR_Function* func, FILE* file)
         RETURN_ERROR(NULL_POINTER, "Null pointer of ir func");
 
     Error error = {};
-    
+    int i = 0;
+    int num_cmd = func->num_commands;
+
     if (strcmp (func->name, "main") == 0)
     {
         fprintf (file, "_start:\n");
         fprintf (file, "mov %s, RAM\n", IR_STACK_REG);
+        i = 1;
+        num_cmd -= 2;
     } 
     else
     {
         fprintf (file, "%s:\n", func->name);
     }
 
-    for (int i = 0; i < func->num_commands; i++)
+    for (; i < num_cmd; i++)
     {
         IR_Command cmd = func->commands[i];
         const char* name_cmd = IR_TO_ASM_CMD_TABLE[cmd.cmd_type];
@@ -129,11 +136,17 @@ Error print_asm_cmd_arg (IR_Command cmd, FILE* file)
 Error print_asm_header (FILE* file)
 {
     fprintf (file, "global _start\n\n");
-    fprintf (file, "section .bss\n");
-    fprintf (file, "RAM resw %d\n", RAM_SIZE);
-    fprintf (file, "BUFF resb 100\n\n");
     fprintf (file, "section .text\n\n");
     fprintf (file, "%%INCLUDE \"%s\"\n\n", IO_LIB_NAME);
+
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error print_asm_section_data (FILE* file)
+{
+    fprintf (file, "section .data\n");
+    fprintf (file, "RAM: dq %d dup 0\n", RAM_SIZE);
+    fprintf (file, "BUFF: db %d dup 0\n", BUF_SIZE);
 
     RETURN_ERROR(CORRECT, "");
 }

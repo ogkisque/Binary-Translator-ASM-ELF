@@ -1,5 +1,4 @@
-section .text
-
+nop
 my_input:
     push r10
     push r11
@@ -14,7 +13,6 @@ my_input:
     mov rcx, rax
     dec rcx
     xor rax, rax
-    mov rsi, BUFF
     xor rbx, rbx
     mov r15, 10
 
@@ -65,7 +63,7 @@ my_print:
     mov rsi, BUFF
     mov rcx, 99
     mov r15, 10
-    mov [BUFF + 100], r15b
+    mov [rsi + 100], r15b
 
     mov r12b, '0'
     cmp rax, 0
@@ -79,13 +77,13 @@ my_print:
         div r15         ; rax /= 10, rdx = rax % 10
 
         add rdx, '0'
-        mov byte [BUFF + rcx], dl
+        mov byte [rsi + rcx], dl
         dec rcx
 
         cmp rax, 0
         jne .loop
 
-    mov [BUFF + rcx], r12b
+    mov [rsi + rcx], r12b
     add rsi, rcx
     add rsi, 1
     mov rax, 0x01
@@ -106,3 +104,4 @@ my_print:
     pop r10
 
     ret
+nop

@@ -27,7 +27,9 @@ enum Error_codes
     VARS_OVERFLOW =     15,
     SYNTAX_ERR =        16,
     UNKNOWN_OPER =      17,
-    UNKNOWN_DATA =      18
+    UNKNOWN_DATA =      18,
+    UNKNOWN_CMD =       19,
+    UNKNOWN_LABEL =     20
 };
 
 struct Error

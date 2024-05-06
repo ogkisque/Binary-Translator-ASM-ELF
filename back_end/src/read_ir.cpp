@@ -52,12 +52,18 @@ Error ir_fill (IR_Struct* ir, Functions* funcs)
         RETURN_ERROR(NULL_POINTER, "Null pointer of funcs in ir struct. Do ctor");
 
     Error error = {};
+    ir->functions[0]->offset = 0;
     for (int i = 0; i < ir->num_functions; i++)
     {
+        if (i > 0)
+            ir->functions[i]->offset = ir->functions[i-1]->offset + ir->functions[i-1]->num_opcodes;
         ir->functions[i]->name = funcs->funcs[i]->root->name;
+
         error = ir_fill_func (ir->functions[i], funcs->funcs[i]->root);
         PARSE_ERROR_WITHOUT_TREE(error);
     }
+
+    error = ir_fill_adrs (ir);
 
     RETURN_ERROR(CORRECT, "");
 }
@@ -69,11 +75,26 @@ Error ir_fill_func (IR_Function* ir_func, const Node* node)
     ir_func->cur_if     = 0;
     ir_func->cur_while  = 0;
 
+    if (strcmp (ir_func->name, "main") == 0)
+    {
+        error = ir_add_mov_ram (ir_func);
+        PARSE_ERROR_WITHOUT_TREE(error);
+    }
+
     error = ir_fill_func_args (ir_func, node);
     PARSE_ERROR_WITHOUT_TREE(error);
 
     error = ir_fill_func_cmds (ir_func, node->right);
     PARSE_ERROR_WITHOUT_TREE(error);
+
+    if (strcmp (ir_func->name, "main") == 0)
+    {
+        error = ir_add_syscall (ir_func);
+        PARSE_ERROR_WITHOUT_TREE(error);
+    }
+
+    ir_func->num_opcodes = ir_func->commands[ir_func->cur_command - 1].offset +
+                           ir_func->commands[ir_func->cur_command - 1].num_bytes;
 
     RETURN_ERROR(CORRECT, "");
 }
@@ -320,10 +341,11 @@ Error ir_add_cmd_while (IR_Function* func, const Node* node)
     RETURN_ERROR(CORRECT, "");
 }
 
-void ir_add_cmd (IR_Function* func, IR_CommandType cmd_type,
+Error ir_add_cmd (IR_Function* func, IR_CommandType cmd_type,
                  IR_DataType type1, const char* name1, int val1,
                  IR_DataType type2, const char* name2, int val2)
 {
+    Error error = {};
     func->commands[func->cur_command].cmd_type = cmd_type;
 
     func->commands[func->cur_command].data_type1 = type1;
@@ -333,9 +355,213 @@ void ir_add_cmd (IR_Function* func, IR_CommandType cmd_type,
     func->commands[func->cur_command].data_type2 = type2;
     strcpy (func->commands[func->cur_command].data_value2.name, name2);
     func->commands[func->cur_command].data_value2.value = val2;
+    
+    if (cmd_type != IR_LABEL_CMD)
+    {
+        error = ir_add_cmd_opcode (func);
+        PARSE_ERROR_WITHOUT_TREE(error);
+    }
+    else
+    {
+        if (func->cur_command != 0)
+            func->commands[func->cur_command].offset = func->commands[func->cur_command - 1].offset + 
+                                                       func->commands[func->cur_command - 1].num_bytes;
+        else
+            func->commands[func->cur_command].offset = 0;
+
+        func->labels[func->num_labels].type = func->commands[func->cur_command].data_type1;
+        func->labels[func->num_labels].num = func->commands[func->cur_command].data_value1.value;
+        func->labels[func->num_labels].offset = func->commands[func->cur_command].offset;
+        func->num_labels++;
+    }
 
     func->cur_command++;                                             
     func->num_commands++;
+
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error ir_add_cmd_opcode (IR_Function* func)
+{
+    if (!func)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of ir func");
+
+    IR_Command* cmd = &(func->commands[func->cur_command]);
+    for (int i = 0; i < IR_OPCODES_TABLE_SIZE; i++)
+    {
+        IR_CmdOpcode opcode_struct = IR_TO_OPCODE_TABLE[i];
+        if (cmd->cmd_type == opcode_struct.cmd_type)
+        {
+            if (opcode_struct.num_opcodes == 1)
+            {
+                cmd->num_bytes = opcode_struct.opcodes[0].opcode_size;
+                memcpy (cmd->opcode, opcode_struct.opcodes[0].opcode, cmd->num_bytes);
+            }
+            else
+            {
+                for (int j = 0; j < opcode_struct.num_opcodes; j++)
+                {
+                    if (opcode_struct.opcodes[j].data_type1 == cmd->data_type1 &&
+                        strcmp (opcode_struct.opcodes[j].data_name1, cmd->data_value1.name) == 0)
+                    {
+                        cmd->num_bytes = opcode_struct.opcodes[j].opcode_size;
+                        memcpy (cmd->opcode, opcode_struct.opcodes[j].opcode, cmd->num_bytes);
+
+                        if (cmd->data_type1 == IR_NUM || cmd->data_type1 == IR_MEM)
+                            get_hex_num (cmd, cmd->data_value1.value);
+                        else if (cmd->data_type2 == IR_NUM)
+                            get_hex_num (cmd, cmd->data_value2.value);
+                    }
+                }
+            }
+
+            if (func->cur_command == 0)
+                cmd->offset = 0;
+            else
+                cmd->offset = func->commands[func->cur_command - 1].offset +
+                              func->commands[func->cur_command - 1].num_bytes;
+            
+            RETURN_ERROR(CORRECT, "");
+        }
+    }
+
+    RETURN_ERROR(UNKNOWN_CMD, "Unknown cmd for opcodes");
+}
+
+Error ir_fill_adrs (IR_Struct* ir)
+{
+    if (!ir)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of ir struct");
+    Error error = {};
+
+    for (int i = 0; i < ir->num_functions; i++)
+    {
+        IR_Function* func = ir->functions[i];
+        for (int j = 0; j < func->num_commands; j++)
+        {
+            IR_Command* cmd = &(func->commands[j]);
+            if (cmd->cmd_type == IR_JMP || cmd->cmd_type == IR_JE ||
+                cmd->cmd_type == IR_JNE || cmd->cmd_type == IR_JG ||
+                cmd->cmd_type == IR_JGE || cmd->cmd_type == IR_JL ||
+                cmd->cmd_type == IR_JLE)
+            {
+                error = ir_fill_jmp_adr (func, j);
+                PARSE_ERROR_WITHOUT_TREE(error);
+            }
+            else if (cmd->cmd_type == IR_FUNC)
+            {
+                error = ir_fill_call_adr (ir, func, j);
+                PARSE_ERROR_WITHOUT_TREE(error);
+            }
+        }
+    }
+
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error ir_fill_jmp_adr (IR_Function* func, int curr_cmd)
+{
+    if (!func)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of ir func");
+    
+    IR_Command* cmd = &(func->commands[curr_cmd]);
+    IR_DataType label_type = cmd->data_type1;
+    int label_num = cmd->data_value1.value;
+    int offset = -1;
+
+    for (int i = 0; i < func->num_labels; i++)
+        if (label_type == func->labels[i].type && label_num == func->labels[i].num)
+            offset = func->labels[i].offset;
+
+    if (offset == -1)
+        RETURN_ERROR(UNKNOWN_LABEL, "Jump on unknown label");
+
+    int jump = offset - func->commands[curr_cmd + 1].offset;
+
+    get_hex_num (cmd, jump);
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error ir_fill_call_adr (IR_Struct* ir, IR_Function* func, int curr_cmd)
+{
+    if (!ir)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of ir struct");
+    if (!func)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of ir func");
+
+    IR_Command* cmd = &(func->commands[curr_cmd]);
+    char* name_label = cmd->data_value1.name;
+    int offset = -1;
+
+    if (strcmp (name_label, "my_input") == 0 || strcmp (name_label, "my_print") == 0)
+        RETURN_ERROR(CORRECT, "");
+
+    for (int i = 0; i < ir->num_functions; i++)
+        if (strcmp (ir->functions[i]->name, name_label) == 0)
+            offset = ir->functions[i]->offset;
+
+    if (offset == -1)
+        RETURN_ERROR(UNKNOWN_LABEL, "Call unknown func");
+
+    int jump = 0;
+    if (offset <= func->offset)
+        jump = offset - (func->offset + func->commands[curr_cmd + 1].offset);
+    else
+        jump = offset - (func->offset + cmd->offset);
+
+    get_hex_num (cmd, jump);
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error ir_add_mov_ram (IR_Function* func)
+{
+    IR_Command* cmd = &(func->commands[0]);
+
+    cmd->cmd_type           = IR_MOV_RAM;
+    cmd->data_type1         = IR_NONE;
+    cmd->data_type2         = IR_NONE;
+    cmd->offset             = 0;
+    cmd->num_bytes          = 10;
+    unsigned char code[5]   = {0x49, 0xbf, 0x00, 0x20, 0x40};
+    memcpy (cmd->opcode, code, 5);
+
+    func->cur_command++;
+    func->num_commands++;
+
+    RETURN_ERROR(CORRECT, "");
+}
+
+Error ir_add_syscall (IR_Function* func)
+{
+    IR_Command* cmd = &(func->commands[func->cur_command]);
+
+    cmd->cmd_type           = IR_MOV_RAX;
+    cmd->data_type1         = IR_NONE;
+    cmd->data_type2         = IR_NONE;
+    cmd->offset             = func->commands[func->cur_command - 1].offset +
+                              func->commands[func->cur_command - 1].num_bytes;
+    cmd->num_bytes          = 7;
+    unsigned char code[7]   = {0x48, 0xc7, 0xc0, 0x3c, 0x00, 0x00, 0x00};
+    memcpy (cmd->opcode, code, 7);
+
+    func->cur_command++;
+    func->num_commands++;
+
+    IR_Command* cmd1 = &(func->commands[func->cur_command]);
+
+    cmd1->cmd_type           = IR_SYSCALL;
+    cmd1->data_type1         = IR_NONE;
+    cmd1->data_type2         = IR_NONE;
+    cmd1->offset             = func->commands[func->cur_command - 1].offset +
+                               func->commands[func->cur_command - 1].num_bytes;
+    cmd1->num_bytes          = 2;
+    unsigned char code1[2]   = {0x0f, 0x05};
+    memcpy (cmd1->opcode, code1, 2);
+
+    func->cur_command++;
+    func->num_commands++;
+
+    RETURN_ERROR(CORRECT, "");
 }
 
 Error ir_dump (IR_Struct* ir)
@@ -370,21 +596,51 @@ Error ir_func_dump (IR_Function* ir_func)
         RETURN_ERROR(NULL_POINTER, "Null pointerr of ir commands in func struct");
     
     printf (BLUE_COL);
-    printf ("Function - %s, num of commands - %d, num of vars - %d\n",
-            ir_func->name, ir_func->num_commands, ir_func->num_vars);
+    printf ("Function - %s, num of commands - %d, num of vars - %d\n"
+            "offset - %d, num of opcodes - %d\n",
+            ir_func->name, ir_func->num_commands, ir_func->num_vars,
+            ir_func->offset, ir_func->num_opcodes);
     
     for (int i = 0; i < ir_func->num_commands; i++)
     {
         IR_Command cmd = ir_func->commands[i];
         printf ("#%d %s\n"
-                "<%s %s %d> <%s %s %d>\n",
+                "<%s %s %d> <%s %s %d>\n"
+                "offset: %d\nnum opcodes: %d\n",
                 i, IR_DUMP_CMD_TYPE_TABLE[cmd.cmd_type], 
                 IR_DUMP_DATA_TYPE_TABLE[cmd.data_type1], cmd.data_value1.name, cmd.data_value1.value,
-                IR_DUMP_DATA_TYPE_TABLE[cmd.data_type2], cmd.data_value2.name, cmd.data_value2.value);
+                IR_DUMP_DATA_TYPE_TABLE[cmd.data_type2], cmd.data_value2.name, cmd.data_value2.value,
+                cmd.offset, cmd.num_bytes);
+        for (int j = 0; j < cmd.num_bytes; j++)
+            printf ("0x%02hhx ", cmd.opcode[j]);
+        printf ("\n\n");
     }
 
     printf (OFF_COL);
     RETURN_ERROR(CORRECT, "");
+}
+
+int get_num_not_zero_bytes (unsigned char opcode[])
+{
+    int i = 0;
+    for (i = 0; opcode[i] != 0; i++) ;
+    return i;
+}
+
+void get_hex_num (IR_Command* cmd, int num)
+{
+    unsigned char hex_num[4] = "";
+    for (int i = 0; i < 4; i++)
+    {
+        if (num == 0)
+            break;
+        
+        unsigned char x = num & 0xff;
+        num = num >> 8;
+        hex_num[i] = x;
+    }
+
+    memcpy (cmd->opcode + cmd->num_bytes - 4, hex_num, 4);
 }
 
 int ir_get_num_var (const char* name)

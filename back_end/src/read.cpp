@@ -22,8 +22,6 @@ Error read_trees (Functions* funcs, ReadStr* str)
             funcs->num_funcs++;
     }
 
-    tree_graph_dump_without_error (funcs->funcs[0]->root);
-
     RETURN_ERROR(CORRECT, "");
 }
 

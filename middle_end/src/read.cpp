@@ -13,8 +13,6 @@ Error read_trees (Functions* funcs, ReadStr* str)
     funcs->num_funcs = 1;
     simple (funcs->funcs[0]->root->right);
 
-    tree_graph_dump_without_error (funcs->funcs[0]->root);
-
     for (size_t i = 1; is_read; i++)
     {
         funcs->funcs[i] = (Function*) calloc (1, sizeof (Function));
@@ -27,8 +25,6 @@ Error read_trees (Functions* funcs, ReadStr* str)
             funcs->num_funcs++;
         }
     }
-
-    //tree_graph_dump_without_error (funcs->funcs[0]->root);
 
     RETURN_ERROR(CORRECT, "");
 }

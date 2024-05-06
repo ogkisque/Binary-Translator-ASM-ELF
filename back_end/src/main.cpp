@@ -4,6 +4,7 @@
 #include "print.h"
 #include "read_ir.h"
 #include "print_asm.h"
+#include "print_elf.h"
 
 #define VERIFY(tree)                            \
         error = tree_verify (&tree);            \
@@ -16,6 +17,7 @@
 
 const char*     INPUT_NAME              = "../middle.txt";
 const char*     OUTPUT_NAME             = "../asm.asm";
+const char*     ELF_NAME                = "../elf";
 
 int main ()
 {
@@ -32,13 +34,22 @@ int main ()
     error = ir_ctor (&ir, &funcs);
 
     error = ir_fill (&ir, &funcs);
-    error = ir_dump (&ir);
 
     FILE* file_print_asm = fopen (OUTPUT_NAME, "w");
     error = print_asm (&ir, file_print_asm);
     fclose (file_print_asm);
 
+    ELF_cmds elf = {};
+    error = elf_ctor (&elf, &ir);
+
+    FILE* file_elf = fopen (ELF_NAME, "wb");
+    error = print_elf (&ir, &elf, file_elf);
+    fclose (file_elf);
+
+    //error = ir_dump (&ir);
+
     funcs_dtor (&funcs);
     error = ir_dtor (&ir);
+    error = elf_dtor (&elf);
     return 0;
 }
