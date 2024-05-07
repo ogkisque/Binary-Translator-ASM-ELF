@@ -21,7 +21,7 @@ Front-end парсит язык в дерево команд. Middle-end упр�
 Например, такой кусок дерева:
 
 <p align = "left">
-      <img src = "imgs/img1.png" width = 12% height = 12%>
+      <img src = "imgs/img1.png" width = 25% height = 25%>
 </p>
 
 Перейдёт в:
@@ -74,7 +74,7 @@ IR_PUSH      | IR_REG         | r10                 | IR_NONE        | -        
 Такова структура у elf файла:
 
 <p align = "left">
-      <img src = "imgs/img2.png" width = 15% height = 15%>
+      <img src = "imgs/img2.png" width = 30% height = 30%>
 </p>
 
 В моём случае будет только 2 сегмента - .text и .data.
