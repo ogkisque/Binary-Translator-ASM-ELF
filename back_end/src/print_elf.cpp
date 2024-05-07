@@ -135,45 +135,28 @@ Error elf_add_text_section (ELF_cmds* elf, IR_Struct* ir)
 
 Error elf_add_header (ELF_cmds* elf, int main_offset)
 {
-    // typedef struct {
-    //         unsigned char e_ident[16];      /* Магическое число и другая информация */
-    //         uint16_t e_type;                /* Тип объектного файла */
-    //         uint16_t e_machine;             /* Архитектура */
-    //         uint32_t e_version;             /* Версия объектного файла */
-    //         uint64_t e_entry;               /* Виртуальный адрес точки входа */
-    //         uint64_t e_phoff;               /* Смещение таблицы заголовков программы в файле */
-    //         uint64_t e_shoff;               /* Смещение таблицы заголовков секций в файле */
-    //         uint32_t e_flags;               /* Флаги, зависящие от процессора */
-    //         uint16_t e_ehsize;              /* Размер заголовка ELF в байтах */
-    //         uint16_t e_phentsize;           /* Размер записи таблицы заголовков программы */
-    //         uint16_t e_phnum;               /* Количество записей в таблице заголовков программы */
-    //         uint16_t e_shentsize;           /* Размер записи таблицы заголовков секций */
-    //         uint16_t e_shnum;               /* Количество записей в таблице заголовков секций */
-    //         uint16_t e_shstrndx;            /* Индекс таблицы строк в заголовке секции */
-    // } Elf64_Ehdr;
-
     Elf64_Ehdr elf_header = {};
-    unsigned char e_ident[EI_NIDENT] = {0x7f,
-                                        0x45,
-                                        0x4c,
-                                        0x46,
-                                        0x02,
-                                        0x01,
-                                        0x01};
-    e_ident[15] = 0x10;
-
-    memcpy (elf_header.e_ident, e_ident, sizeof(elf_header.e_ident));
+    elf_header.e_ident[EI_MAG0]        = ELFMAG0;
+    elf_header.e_ident[EI_MAG1]        = ELFMAG1;              
+    elf_header.e_ident[EI_MAG2]        = ELFMAG2;
+    elf_header.e_ident[EI_MAG3]        = ELFMAG3;
+    elf_header.e_ident[EI_CLASS]       = ELFCLASS64;
+    elf_header.e_ident[EI_DATA]        = ELFDATA2LSB;
+    elf_header.e_ident[EI_VERSION]     = EV_CURRENT;
+    elf_header.e_ident[EI_OSABI]       = ELFOSABI_NONE;  
+    elf_header.e_ident[EI_ABIVERSION]  = 0x00;  
+    elf_header.e_ident[EI_PAD]         = ET_NONE;
     
     elf_header.e_type       = ET_EXEC;
     elf_header.e_machine    = EM_X86_64;
-    elf_header.e_version    = EI_VERSION;                   // дублирует из e_ident
+    elf_header.e_version    = EI_VERSION;                                   // дублирует из e_ident
     elf_header.e_entry      = ELF_START_ADR + ELF_ALIGNMENT + main_offset;  // абсолютный виртуальный адрес начала выполнения программы
-    elf_header.e_phoff      = sizeof(Elf64_Ehdr);           // смещение от файла к program header table
-    elf_header.e_shoff      = 0;                            // смещение от начала файла к section header table
+    elf_header.e_phoff      = sizeof(Elf64_Ehdr);                           // смещение от файла к program header table
+    elf_header.e_shoff      = 0;                                            // смещение от начала файла к section header table
     elf_header.e_flags      = 0;
-    elf_header.e_ehsize     = sizeof(Elf64_Ehdr);           // размер заголовка ELF
+    elf_header.e_ehsize     = sizeof(Elf64_Ehdr);                           // размер заголовка ELF
     elf_header.e_phentsize  = sizeof(Elf64_Phdr);
-    elf_header.e_phnum      = 2;                            // количество заголовков программы .text и .data
+    elf_header.e_phnum      = 2;                                            // количество заголовков программы .text и .data
     elf_header.e_shentsize  = 0;
     elf_header.e_shnum      = 0;
     elf_header.e_shstrndx   = 0;
@@ -185,41 +168,29 @@ Error elf_add_header (ELF_cmds* elf, int main_offset)
 
 Error elf_add_program_header_table (ELF_cmds* elf)
 {
-    // typedef struct
-    // {
-    //         uint32_t	p_type;			/* Segment type */
-    //         uint32_t	p_flags;		/* Segment flags */
-    //         uint64_t	p_offset;		/* Segment file offset */
-    //         uint64_t	p_vaddr;		/* Segment virtual address */
-    //         uint64_t	p_paddr;		/* Segment physical address */
-    //         uint64_t	p_filesz;		/* Segment size in file */
-    //         uint64_t	p_memsz;		/* Segment size in memory */
-    //         uint64_t	p_align;		/* Segment alignment */
-    // } Elf64_Phdr;
-    
     Elf64_Phdr text_prog_header  = {};
 
     text_prog_header.p_type      = PT_LOAD;
-    text_prog_header.p_offset    = ELF_ALIGNMENT;           // смещение от начала файла
-    text_prog_header.p_vaddr     = ELF_START_ADR + ELF_ALIGNMENT;           // виртуальный адрес
-    text_prog_header.p_paddr     = 0;                       // физический адрес
-    text_prog_header.p_filesz    = ELF_ALIGNMENT;       // количество байтов в образе файла сегмента
-    text_prog_header.p_memsz     = ELF_ALIGNMENT;       // количество байтов в памяти образа сегмента
-    text_prog_header.p_flags     = PF_R | PF_X;             // PF_R = READ - 0x04, PF_W = WRITE - 0x02, PF_X = EXEC - 0x01
-    text_prog_header.p_align     = ELF_ALIGNMENT;           // выравнивание
+    text_prog_header.p_offset    = ELF_ALIGNMENT;                   // смещение от начала файла
+    text_prog_header.p_vaddr     = ELF_START_ADR + ELF_ALIGNMENT;   // виртуальный адрес
+    text_prog_header.p_paddr     = 0;                               // физический адрес
+    text_prog_header.p_filesz    = ELF_ALIGNMENT;                   // количество байтов в образе файла сегмента
+    text_prog_header.p_memsz     = ELF_ALIGNMENT;                   // количество байтов в памяти образа сегмента
+    text_prog_header.p_flags     = PF_R | PF_X;                     // PF_R = READ - 0x04, PF_W = WRITE - 0x02, PF_X = EXEC - 0x01
+    text_prog_header.p_align     = ELF_ALIGNMENT;                   // выравнивание
 
     memcpy(elf->cmds + sizeof (Elf64_Ehdr), &text_prog_header, sizeof(text_prog_header));
 
     Elf64_Phdr data_prog_header  = {};
 
     data_prog_header.p_type      = PT_LOAD;
-    data_prog_header.p_offset    = 2 * ELF_ALIGNMENT;       // смещение от начала файла
-    data_prog_header.p_vaddr     = ELF_START_ADR + 2 * ELF_ALIGNMENT;              // виртуальный адрес
-    data_prog_header.p_paddr     = 0;                       // физический адрес
-    data_prog_header.p_filesz    = 5 * ELF_ALIGNMENT;       // количество байтов в образе файла сегмента
-    data_prog_header.p_memsz     = 5 * ELF_ALIGNMENT;       // количество байтов в памяти образа сегмента
-    data_prog_header.p_flags     = PF_R | PF_X | PF_W;      // PF_R = READ - 0x04, PF_W = WRITE - 0x02, PF_X = EXEC - 0x01
-    data_prog_header.p_align     = ELF_ALIGNMENT;           // выравнивание
+    data_prog_header.p_offset    = 2 * ELF_ALIGNMENT;                   // смещение от начала файла
+    data_prog_header.p_vaddr     = ELF_START_ADR + 2 * ELF_ALIGNMENT;   // виртуальный адрес
+    data_prog_header.p_paddr     = 0;                                   // физический адрес
+    data_prog_header.p_filesz    = 5 * ELF_ALIGNMENT;                   // количество байтов в образе файла сегмента
+    data_prog_header.p_memsz     = 5 * ELF_ALIGNMENT;                   // количество байтов в памяти образа сегмента
+    data_prog_header.p_flags     = PF_R | PF_X | PF_W;                  // PF_R = READ - 0x04, PF_W = WRITE - 0x02, PF_X = EXEC - 0x01
+    data_prog_header.p_align     = ELF_ALIGNMENT;                       // выравнивание
 
     memcpy(elf->cmds + sizeof (Elf64_Ehdr) + sizeof (Elf64_Phdr), &data_prog_header, sizeof(data_prog_header));
     

@@ -11,7 +11,7 @@ cd back_end
 cd ..
 
 nasm -f elf64 asm.asm
-ld  asm.o -o elf_from_asm
+ld asm.o -o elf_from_asm
 
 chmod u+x elf
 

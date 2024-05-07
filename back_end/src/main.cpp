@@ -46,7 +46,7 @@ int main ()
     error = print_elf (&ir, &elf, file_elf);
     fclose (file_elf);
 
-    //error = ir_dump (&ir);
+    error = ir_dump (&ir);
 
     funcs_dtor (&funcs);
     error = ir_dtor (&ir);
