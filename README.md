@@ -75,7 +75,9 @@ IR_PUSH      | IR_REG         | r10                 | IR_NONE        | -        
 
 <p align = "left">
       <img src = "imgs/img2.png" width = 30% height = 30%>
+      <figcaption>(источник картинки - https://www.slideserve.com/andrew/dynamic-kernel-patching-powerpoint-ppt-presentation)</figcaption>
 </p>
+
 
 В моём случае будет только 2 сегмента - .text и .data.
 Секция .text по сути представлена в IR. Единственная задача этого этапа - заполнение заголовков.
